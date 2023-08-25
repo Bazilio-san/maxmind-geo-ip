@@ -1,0 +1,4 @@
+---
+maxMind:
+  licenseKey: MAXMIND_LICENSE_KEY
+  maxItemsInCache: MAXMIND_MAX_ITEMS_IN_CACHE

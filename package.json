@@ -1,0 +1,70 @@
+{
+  "name": "maxmind-geo-ip",
+  "version": "2.0.18",
+  "keywords": [
+    "service",
+    "geoip"
+  ],
+  "productName": "Maxmind GeoIP",
+  "description": "Service for obtaining geolocation by IP address (based on MaxMind GeoIP)",
+  "license": "ISC",
+  "main": "./dist/cjs/src/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "scripts": {
+    "start": "node ./dist/cjs/src/start.js",
+    "lint": "eslint --ext .js,.ts ./",
+    "lint:fix": "eslint --fix --ext .js,.ts ./",
+    "test": "jest --config jest.config.js",
+    "clean": "shx rm -rf dist/*",
+    "build": "tsc -b tsconfig.json tsconfig.types.json",
+    "cb": "npm run clean && npm run build"
+  },
+  "author": "Viacheslav Makarov <vvmakarov@bazilio.ru>",
+  "dependencies": {
+    "af-color": "^0.0.8",
+    "af-tools-ts": "^1.0.48",
+    "axios": "^1.4.0",
+    "config": "^3.3.9",
+    "cron": "^2.4.1",
+    "download": "^8.0.0",
+    "fs-extra": "^11.1.1",
+    "maxmind": "^4.3.11"
+  },
+  "devDependencies": {
+    "@jest/test-sequencer": "^29.6.3",
+    "@types/config": "^3.3.0",
+    "@types/download": "^8.0.2",
+    "@types/fs-extra": "^11.0.1",
+    "@types/jest": "^29.5.4",
+    "@types/luxon": "^3.3.1",
+    "eslint-config-af-22": "^1.0.13",
+    "jest": "^29.6.3",
+    "shx": "^0.3.4",
+    "supertest": "^6.3.3",
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.1.6"
+  },
+  "np": {
+    "yarn": false,
+    "contents": "."
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist/cjs/src",
+    "dist/esm",
+    "dist/types",
+    "src"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Bazilio-san/maxmind-geo-ip.git"
+  },
+  "engines": {
+    "node": ">= 14",
+    "npm": ">= 6.13.4",
+    "yarn": ">= 1.21.1"
+  }
+}
