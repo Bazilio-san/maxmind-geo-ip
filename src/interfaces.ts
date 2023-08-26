@@ -44,7 +44,10 @@ export interface IGeoIP {
   eventEmitter?: EventEmitter,
   ready: boolean,
   checkReady: () => void,
+
   dbRevision: number, // Timestamp in hours
+  dbDate: string, // YYYY-MM-DD
+
   dbDir: string, // Absolute path to the folder where the database is loaded
 
   lookup: (ipAddress: string) => CityResponse | null,

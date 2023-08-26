@@ -1,6 +1,6 @@
 {
   "name": "maxmind-geo-ip",
-  "version": "2.0.26",
+  "version": "2.0.27",
   "keywords": [
     "service",
     "geoip"

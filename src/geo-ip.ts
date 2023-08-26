@@ -18,11 +18,11 @@ export const geoIP: IGeoIP = {
     this.reader = reader;
     this.dbRevision = getDbRevision(reader);
     this.ready = true;
-    const revDate = revisionDate(this.dbRevision);
+
     if (this.eventEmitter?.emit) {
-      this.eventEmitter.emit('geo-ip-ready', revDate);
+      this.eventEmitter.emit('geo-ip-ready', this.dbDate);
       if (prevRevision !== this.dbRevision) {
-        this.eventEmitter.emit('geo-ip-change-revision', revDate);
+        this.eventEmitter.emit('geo-ip-change-revision', this.dbDate);
       }
     }
   },
@@ -64,6 +64,9 @@ export const geoIP: IGeoIP = {
     }
   },
   dbRevision: 0,
+  get dbDate () {
+    return revisionDate(this.dbRevision);
+  },
   dbDir: DB_DIR_DEFAULT,
   transferOptions (options: IMaxMindOptions) {
     options.edition = 'City';
