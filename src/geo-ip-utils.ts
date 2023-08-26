@@ -8,7 +8,7 @@ import { Response } from 'mmdb-lib/lib/reader/response';
 import { IMaxMindOptions, TEdition } from './interfaces';
 import { echo, echoError, getYMD } from './utils';
 
-const MILLIS_IN_HOUR = 3_600_000;
+export const MILLIS_IN_HOUR = 3_600_000;
 export const MAX_ITEMS_IN_CACHE_DEFAULT = 6000;
 export const rootDir = process.cwd();
 export const DB_DIR_DEFAULT = './maxmind-db';
@@ -30,7 +30,9 @@ export const getDbRevision = (reader: Reader<any> | undefined): number => {
   return Math.floor((be ? +be : 0) / MILLIS_IN_HOUR);
 };
 
-export const revisionDate = (revision: number): string => `[v ${getYMD(new Date(revision * MILLIS_IN_HOUR))}]`;
+export const revisionDate = (revision: number): string => getYMD(new Date(revision * MILLIS_IN_HOUR));
+
+export const revisionString = (revision: number): string => `[v ${revisionDate(revision)}]`;
 
 /**
  * Возвращает метку времени в часах
@@ -81,6 +83,6 @@ export const downloadCityDb = async (options: IMaxMindOptions): Promise<true | u
     return;
   }
   const reader = await getReader(options);
-  echo(`Downloaded DB ${revisionDate(getDbRevision(reader))}`);
+  echo(`Downloaded DB ${revisionString(getDbRevision(reader))}`);
   return true;
 };

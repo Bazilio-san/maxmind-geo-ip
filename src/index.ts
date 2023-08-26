@@ -5,7 +5,7 @@ export {
   MAX_ITEMS_IN_CACHE_DEFAULT,
   getLastDbRevision,
   getReader,
-  revisionDate,
+  revisionString,
   getDbName,
   getPermanentLink,
 } from './geo-ip-utils';

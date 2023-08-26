@@ -5,18 +5,35 @@ import { Reader } from 'mmdb-lib';
 import { bold } from 'af-color';
 import { exitOnError, echo, echoError } from './utils';
 import {
-  downloadCityDb, getDbRevision, getDbPath, MAX_ITEMS_IN_CACHE_DEFAULT, getLastDbRevision, getReader, revisionDate, getDbDir, DB_DIR_DEFAULT,
+  downloadCityDb, getDbRevision, getDbPath,
+  MAX_ITEMS_IN_CACHE_DEFAULT, getLastDbRevision,
+  getReader, revisionString, getDbDir, DB_DIR_DEFAULT, revisionDate,
 } from './geo-ip-utils';
 import { IGeoIP, CityResponseEx, IMaxMindOptions } from './interfaces';
 
 export const geoIP: IGeoIP = {
   reader: undefined,
-  lookup: (ipAddress: string): CityResponse | null => geoIP.reader?.get(ipAddress) || null,
-  lookupEx: (ipAddress: string, lang: string = 'en'): CityResponseEx | null => {
+  setReader (reader: Reader<CityResponse>) {
+    const prevRevision = this.dbRevision;
+    this.reader = reader;
+    this.dbRevision = getDbRevision(reader);
+    this.ready = true;
+    const revDate = revisionDate(this.dbRevision);
+    if (this.eventEmitter?.emit) {
+      this.eventEmitter.emit('geo-ip-ready', revDate);
+      if (prevRevision !== this.dbRevision) {
+        this.eventEmitter.emit('geo-ip-change-revision', revDate);
+      }
+    }
+  },
+  lookup (ipAddress: string): CityResponse | null {
+    return this.reader?.get(ipAddress) || null;
+  },
+  lookupEx (ipAddress: string, lang: string = 'en'): CityResponseEx | null {
     if (!ipAddress) {
       return null;
     }
-    const g = geoIP.lookup(ipAddress);
+    const g = this.lookup(ipAddress);
     if (!g) {
       return null;
     }
@@ -48,11 +65,17 @@ export const geoIP: IGeoIP = {
   },
   dbRevision: 0,
   dbDir: DB_DIR_DEFAULT,
+  transferOptions (options: IMaxMindOptions) {
+    options.edition = 'City';
+    this.dbDir = getDbDir(options.dbDir);
+    if (options.eventEmitter?.emit) {
+      this.eventEmitter = options.eventEmitter;
+    }
+  },
 };
 
 export const initCityDb = async (options: IMaxMindOptions): Promise<undefined | IGeoIP> => {
-  options.edition = 'City';
-  geoIP.dbDir = getDbDir(options.dbDir);
+  geoIP.transferOptions(options);
   const { noExitOnError = false } = options;
   let reader: Reader<CityResponse> | undefined;
   const cityDbName = getDbPath(options);
@@ -76,17 +99,14 @@ export const initCityDb = async (options: IMaxMindOptions): Promise<undefined | 
     exitOnError(errorMessage, noExitOnError);
     return;
   }
-  geoIP.reader = reader;
-  geoIP.dbRevision = getDbRevision(reader);
-  echo(`Initialized DB ${cityDbName} ${revisionDate(geoIP.dbRevision)}`);
-  geoIP.ready = true;
+  geoIP.setReader(reader);
+  echo(`Initialized DB ${cityDbName} ${revisionString(geoIP.dbRevision)}`);
   return geoIP;
 };
 
 export const updateCityDb = async (options: IMaxMindOptions): Promise<number> => {
+  geoIP.transferOptions(options);
   let reader: Reader<CityResponse> | undefined;
-  options.edition = 'City';
-  geoIP.dbDir = getDbDir(options.dbDir);
   const cityDbName = getDbPath(options);
   if (!geoIP.ready && !(await initCityDb(options))) {
     return -1;
@@ -95,10 +115,10 @@ export const updateCityDb = async (options: IMaxMindOptions): Promise<number> =>
   try {
     const lastRevision = await getLastDbRevision(options);
     if (lastRevision - geoIP.dbRevision < 48) {
-      echo(`DB up to date ${revisionDate(geoIP.dbRevision)}`);
+      echo(`DB up to date ${revisionString(geoIP.dbRevision)}`);
       return 0;
     }
-    echo(`Newer DB found ${revisionDate(lastRevision)}`);
+    echo(`Newer DB found ${revisionString(lastRevision)}`);
 
     if (!(await downloadCityDb(options))) {
       return -1;
@@ -114,10 +134,8 @@ export const updateCityDb = async (options: IMaxMindOptions): Promise<number> =>
   }
 
   const oldRevision = geoIP.dbRevision;
-  geoIP.reader = reader;
-  geoIP.dbRevision = getDbRevision(reader);
-  geoIP.ready = true;
-  echo(`Updated DB ${revisionDate(oldRevision)} -> ${revisionDate(geoIP.dbRevision)}`);
+  geoIP.setReader(reader);
+  echo(`Updated DB ${revisionString(oldRevision)} -> ${revisionString(geoIP.dbRevision)}`);
   return 1;
 };
 

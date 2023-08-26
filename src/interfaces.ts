@@ -1,5 +1,6 @@
 import { Reader } from 'mmdb-lib';
 import { CityResponse } from 'maxmind';
+import EventEmitter from 'events';
 
 export type TEdition = 'City' | 'ASN' | 'Country';
 
@@ -18,6 +19,7 @@ export interface IMaxMindOptions {
   dbDir?: string,
   // Do not interrupt the program execution if it was not possible to initialize the database. Default - undefined (abort)
   noExitOnError?: boolean
+  eventEmitter?: EventEmitter
 }
 
 export interface IMaxMindConfig {
@@ -38,6 +40,8 @@ export interface CityResponseEx {
 
 export interface IGeoIP {
   reader?: Reader<CityResponse>
+  setReader: (reader: Reader<CityResponse>) => void,
+  eventEmitter?: EventEmitter,
   ready: boolean,
   checkReady: () => void,
   dbRevision: number, // Timestamp in hours
@@ -45,4 +49,5 @@ export interface IGeoIP {
 
   lookup: (ipAddress: string) => CityResponse | null,
   lookupEx: (ipAddress: string, lang?: string) => CityResponseEx | null,
+  transferOptions: (options: IMaxMindOptions) => void,
 }
