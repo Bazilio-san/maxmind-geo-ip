@@ -1,6 +1,6 @@
 {
   "name": "maxmind-geo-ip",
-  "version": "2.0.23",
+  "version": "2.0.24",
   "keywords": [
     "service",
     "geoip"
@@ -23,7 +23,7 @@
   "author": "Viacheslav Makarov <vvmakarov@bazilio.ru>",
   "dependencies": {
     "af-color": "^0.0.8",
-    "af-tools-ts": "^1.0.48",
+    "af-tools-ts": "^1.0.52",
     "config": "^3.3.9",
     "cron": "^2.4.1",
     "download": "^8.0.0",
@@ -31,16 +31,13 @@
     "maxmind": "^4.3.11"
   },
   "devDependencies": {
-    "@jest/test-sequencer": "^29.6.3",
     "@types/config": "^3.3.0",
     "@types/download": "^8.0.2",
     "@types/fs-extra": "^11.0.1",
     "@types/jest": "^29.5.4",
-    "@types/luxon": "^3.3.1",
     "eslint-config-af-22": "^1.0.13",
     "jest": "^29.6.3",
     "shx": "^0.3.4",
-    "supertest": "^6.3.3",
     "ts-jest": "^29.1.1",
     "typescript": "^5.1.6"
   },
