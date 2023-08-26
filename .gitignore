@@ -27,4 +27,5 @@ local*.*
 *.private.*
 **/dist
 /**/.env*
-/db/
+/maxmind-db/
+/db_test/

@@ -11,13 +11,15 @@ import { echo, echoError, getYMD } from './utils';
 const MILLIS_IN_HOUR = 3_600_000;
 export const MAX_ITEMS_IN_CACHE_DEFAULT = 6000;
 export const rootDir = process.cwd();
-export const DB_DIR = path.join(rootDir, 'db');
+export const DB_DIR_DEFAULT = './maxmind-db';
 
-export const getDbName = (edition?: TEdition) => `GeoLite2-${edition || 'City'}.mmdb`;
+export const getDbDir = (dbDir?: string): string => path.normalize(path.resolve(rootDir, dbDir || DB_DIR_DEFAULT));
 
-export const getDbPath = (edition?: TEdition) => path.join(DB_DIR, getDbName(edition));
+export const getDbName = (edition?: TEdition): string => `GeoLite2-${edition || 'City'}.mmdb`;
 
-export const getPermanentLink = (options: IMaxMindOptions, isSha?: boolean) => `https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-${
+export const getDbPath = (options: IMaxMindOptions): string => path.join(getDbDir(options.dbDir), getDbName(options.edition));
+
+export const getPermanentLink = (options: IMaxMindOptions, isSha?: boolean): string => `https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-${
   options.edition || 'City'}&license_key=${options.licenseKey}&suffix=tar.gz${isSha ? '.sha256' : ''}`;
 
 /**
@@ -49,7 +51,7 @@ export const getLastDbRevision = (options: IMaxMindOptions): Promise<number> => 
 };
 
 export const getReader = async <T extends Response = CityResponse> (options: IMaxMindOptions)
-  : Promise<Reader<T>> => maxmind.open<T>(getDbPath(options.edition), { cache: { max: options.maxItemsInCache || MAX_ITEMS_IN_CACHE_DEFAULT } });
+  : Promise<Reader<T>> => maxmind.open<T>(getDbPath(options), { cache: { max: options.maxItemsInCache || MAX_ITEMS_IN_CACHE_DEFAULT } });
 
 interface IDownloadResultItem {
   type: string,
@@ -61,7 +63,7 @@ export const downloadCityDb = async (options: IMaxMindOptions): Promise<true | u
   const url = getPermanentLink(options);
   try {
     echo(`Downloading last City DB...`);
-    const res = await download(url, DB_DIR, { extract: true, filename: getDbName(options.edition) });
+    const res = await download(url, getDbDir(options.dbDir), { extract: true, filename: getDbName(options.edition) });
     const relFilePath = (res as unknown as IDownloadResultItem[]).find((v) => v.type === 'file' && v.path.endsWith('.mmdb'))?.path;
     if (!relFilePath) {
       echoError(`Failed to download database ${url}`);
@@ -72,8 +74,8 @@ export const downloadCityDb = async (options: IMaxMindOptions): Promise<true | u
       echoError(`Failed to get the path to the folder with the downloaded database ${url}`);
       return;
     }
-    fse.moveSync(path.join(DB_DIR, relFilePath), getDbPath(options.edition), { overwrite: true });
-    fse.removeSync(path.join(DB_DIR, srcDir));
+    fse.moveSync(path.join(getDbDir(options.dbDir), relFilePath), getDbPath(options), { overwrite: true });
+    fse.removeSync(path.join(getDbDir(options.dbDir), srcDir));
   } catch (err) {
     echoError(err);
     return;

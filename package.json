@@ -1,6 +1,6 @@
 {
   "name": "maxmind-geo-ip",
-  "version": "2.0.24",
+  "version": "2.0.25",
   "keywords": [
     "service",
     "geoip"
@@ -12,7 +12,6 @@
   "module": "./dist/esm/index.js",
   "types": "./dist/types/index.d.ts",
   "scripts": {
-    "start": "node ./dist/cjs/src/start.js",
     "lint": "eslint --ext .js,.ts ./",
     "lint:fix": "eslint --fix --ext .js,.ts ./",
     "test": "jest --config jest.config.js",

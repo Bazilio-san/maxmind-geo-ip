@@ -6,7 +6,6 @@ export {
   getLastDbRevision,
   getReader,
   revisionDate,
-  DB_DIR,
   getDbName,
   getPermanentLink,
 } from './geo-ip-utils';

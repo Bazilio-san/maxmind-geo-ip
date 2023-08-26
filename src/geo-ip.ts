@@ -4,7 +4,9 @@ import * as fs from 'fs';
 import { Reader } from 'mmdb-lib';
 import { bold } from 'af-color';
 import { exitOnError, echo, echoError } from './utils';
-import { downloadCityDb, getDbRevision, getDbPath, MAX_ITEMS_IN_CACHE_DEFAULT, getLastDbRevision, getReader, revisionDate } from './geo-ip-utils';
+import {
+  downloadCityDb, getDbRevision, getDbPath, MAX_ITEMS_IN_CACHE_DEFAULT, getLastDbRevision, getReader, revisionDate, getDbDir, DB_DIR_DEFAULT,
+} from './geo-ip-utils';
 import { IGeoIP, CityResponseEx, IMaxMindOptions } from './interfaces';
 
 export const geoIP: IGeoIP = {
@@ -45,13 +47,15 @@ export const geoIP: IGeoIP = {
     }
   },
   dbRevision: 0,
+  dbDir: DB_DIR_DEFAULT,
 };
 
 export const initCityDb = async (options: IMaxMindOptions): Promise<undefined | IGeoIP> => {
   options.edition = 'City';
+  geoIP.dbDir = getDbDir(options.dbDir);
   const { noExitOnError = false } = options;
   let reader: Reader<CityResponse> | undefined;
-  const cityDbName = getDbPath(options.edition);
+  const cityDbName = getDbPath(options);
   try {
     if (!fs.existsSync(cityDbName)) {
       if (!(await downloadCityDb(options))) {
@@ -82,7 +86,8 @@ export const initCityDb = async (options: IMaxMindOptions): Promise<undefined | 
 export const updateCityDb = async (options: IMaxMindOptions): Promise<number> => {
   let reader: Reader<CityResponse> | undefined;
   options.edition = 'City';
-  const cityDbName = getDbPath(options.edition);
+  geoIP.dbDir = getDbDir(options.dbDir);
+  const cityDbName = getDbPath(options);
   if (!geoIP.ready && !(await initCityDb(options))) {
     return -1;
   }

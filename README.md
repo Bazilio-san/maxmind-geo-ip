@@ -10,7 +10,8 @@ import { IMaxMindOptions, startGeoIP } from 'maxmind-geo-ip';
 export const maxMindOptions: IMaxMindOptions = {
   licenseKey: '-= license key =-', // https://support.maxmind.com/hc/en-us/sections/1260801610490-Manage-my-License-Keys
   maxItemsInCache: 10000, // https://www.npmjs.com/package/maxmind See "Options"
-  updateSchedule: '0 0 * * 3,6' //  At 00:00 on Wednesday and Saturday. See https://support.maxmind.com/hc/en-us/articles/4408216129947
+  updateSchedule: '0 0 * * 3,6', //  At 00:00 on Wednesday and Saturday. See https://support.maxmind.com/hc/en-us/articles/4408216129947
+  dbDir: './mm-db' // Default: ./maxmind-db
 };
 
 const geoIp = await startGeoIP(maxMindOptions);
