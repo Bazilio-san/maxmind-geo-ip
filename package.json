@@ -1,6 +1,6 @@
 {
   "name": "maxmind-geo-ip",
-  "version": "2.0.22",
+  "version": "2.0.23",
   "keywords": [
     "service",
     "geoip"
@@ -24,7 +24,6 @@
   "dependencies": {
     "af-color": "^0.0.8",
     "af-tools-ts": "^1.0.48",
-    "axios": "^1.4.0",
     "config": "^3.3.9",
     "cron": "^2.4.1",
     "download": "^8.0.0",
